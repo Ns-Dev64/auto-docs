@@ -7,3 +7,62 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+
+model User{
+
+  id String @id @default(cuid())
+  userName String
+  type LoginEnum
+  email String @unique
+  image String
+  repo Repo[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Repo{
+
+  id String @id @default(cuid())
+  repId String @unique
+  repName String
+  repOwnerId String
+  repOwner User @relation(fields: [repOwnerId], references: [id])
+  repoLogs RepoLogs[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RepoLogs {
+
+  id String @id @default(cuid())
+  repId String 
+  repo Repo @relation(fields: [repId], references: [repId])
+  fileHash String
+  treeHash String
+  commitHash String?
+  message String
+  type Logs
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+enum LoginEnum {
+
+  Github
+
+}
+
+enum Logs {
+
+  DOC_ADDED
+  DOC_UPDATED
+  DOC_REMOVED
+
+
+}
