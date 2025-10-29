@@ -21,10 +21,14 @@ const authMiddleware = new Elysia()
 
         const cache = await redisInstance.get(`user:${payload.id}:session`) ?? '' as any ;
 
-        const {authToken} = JSON.parse(cache);
+        const {authToken,access_token} = JSON.parse(cache);
 
-        if(!authToken || authToken !== token){
+        if(!authToken || authToken !== token ){
             throw new ApiError(401,"Unauthorized")
+        }
+
+        if(!access_token){
+            throw new ApiError(401, "Please login again (access revoked)")
         }
 
         return {user: payload}

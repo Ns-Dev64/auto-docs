@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import {
+getSecondsFromDays,
 getSecondsFromHours,
     generateToken,
     getEnv } from "../utils/genericUtils";
@@ -32,7 +33,7 @@ const oauthMiddleware = new Elysia()
         const token = await oauth2.authorize("GitHub");
 
         const access_token: string = (token.data as any).access_token;
-        
+
         const octokit = new Octokit({
             auth: access_token
         });
@@ -67,8 +68,8 @@ const oauthMiddleware = new Elysia()
         const authToken = generateToken(tokenPayload);
 
         await Promise.all([
-            redisInstance.set(`user:${user.id}:session`, JSON.stringify({access_token, authToken}), "EX", getSecondsFromHours(24) ),
-            redisInstance.set(`user:${user.id}`, JSON.stringify(user), "EX", getSecondsFromHours(24))
+            redisInstance.set(`user:${user.id}:session`, JSON.stringify({access_token, authToken}), "EX", getSecondsFromDays(14) ),
+            redisInstance.set(`user:${user.id}`, JSON.stringify(user), "EX", getSecondsFromDays(14))
         ]);
         
         const frontendUrl = getEnv() === "dep" 

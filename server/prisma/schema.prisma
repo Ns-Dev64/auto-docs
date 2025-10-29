@@ -21,6 +21,8 @@ model User{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([id,email])
+
 }
 
 model Repo{
@@ -30,12 +32,49 @@ model Repo{
   repName String
   repOwnerId String
   repOwner User @relation(fields: [repOwnerId], references: [id])
+  repoConfig repoConfig?
   repoLogs RepoLogs[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([id, repId, repOwnerId])
+
 }
 
+model repoConfig {
+  id               String           @id @default(cuid())
+  repoId           String           @unique
+  repo Repo @relation(fields: [repoId], references: [repId])
+  docsFolder       String           @default("docs")
+  enabled          Boolean
+  detailLevel      DetailLevel
+  includeExamples  Boolean
+  includeTypeInfo  Boolean
+  includedPaths    String[]
+  excludedPaths    String[]
+  fileTypes        String[]
+  branches         String[]
+  initialDocConfig InitialDocConfig?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([repoId,id])
+}
+
+model InitialDocConfig {
+  id               String     @id @default(cuid())
+  enabled          Boolean
+  selectedFolders  String[]
+  repoConfigId     String     @unique
+  repoConfig       repoConfig @relation(fields: [repoConfigId], references: [id], onDelete: Cascade)
+}
+
+enum DetailLevel {
+  minimal
+  balanced
+  comprehensive
+}
 model RepoLogs {
 
   id String @id @default(cuid())
@@ -49,6 +88,8 @@ model RepoLogs {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([id, repId, treeHash,commitHash])
 
 }
 

@@ -15,3 +15,7 @@ export const generateToken = (payload: any, isRefresh: boolean = false) => {
 export const getSecondsFromHours = (hours: number) => {
     return hours * 3600
 }
+
+export const getSecondsFromDays = (days: number) =>{
+    return days * 24 * 3600
+}
